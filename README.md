@@ -113,3 +113,82 @@ $user = $tt->get('user:1');
 
 Searching in the database is performed using a [[TyrantQuery]] object.
 
+
+# Tyrant_Query options
+
+
+**Field contains:** *La Geste des Princes-Démons*
+
+## Tyrant_Query::QCSTREQ
+
+This one will work only if the query string is equal to the field. It is also case-sensitive.
+
+## Tyrant_Query::QCSTRINC
+
+Works like *LIKE* in SQL with % before and after the query string, but is also case-sensitive.
+
+- **Princes-D** => La Geste des **Princes-D**émons
+- **Princes-d** => *not found*
+- **Princes D** => *not found*
+- **s Princes-D** => La Geste de**s Princes-D**émons
+
+## Tyrant_Query::QCSTRBW
+
+Is for Begins With. Will find a field that begins with the query string. It is case-sensitive.
+
+Note also that using the QCNEGATE flag, it is possible to find those records which have an empty field. For example :
+<pre><code>
+$q = new Tyrant_query();
+$->addCond('myfield', Tyrant_Query::QCSTRBW | Tyrant_Query::QCNEGATE, '');
+</code></pre>
+
+## Tyrant_Query::QCSTREW
+
+Is for Ends With. Will find a field that ends with the query string. It is case-sensitive.
+
+## Tyrant_Query::QCSTRAND
+
+Will find a result if the field includes all tokens in the query string. So Tyrant first tokenizes the query string by removing whitespaces and some other characters, then tries to find records where the queried field contains every tokens from the query string. It is case-sensitive.
+
+- **La des** => **La** Geste **des** Princes-Démons
+- **La de** => *not found* because Tyrant uses tokens of words
+- **La,Geste** => **La** **Geste** des Princes-Démons
+- **La geste** => *not found* because it is case-sensitive
+- **La,geste,Geste** => **La** **Geste** des Princes-Démons
+- **La Princes** => *not found* because Tyrant doesn't tokenize at -
+- **Geste Princes-Démons** => La **Geste** des **Princes-Démons**
+
+## Tyrant_Query::QCSTROR
+
+Like the previous one, Tyrant first tokenizes the query string, then tries to find a record with at least one token from the query string tokens in the queried field. Still is case-sensitive.
+
+- **La des** => **La** Geste **des** Princes-Démons
+- **La de** => **La** Geste des Princes-Démons
+- **La,Geste** => **La** **Geste** des Princes-Démons
+- **La geste** => **La** Geste des Princes-Démons
+- **La Princes** => **La** Geste des Princes-Démons
+- **Geste Princes-Démons** => La **Geste** des **Princes-Démons**
+
+## Tyrant_Query::QCSTROREQ
+
+This one is a bit tricky because it works like QCSTROR except that it will only find fields that are equals to one of the tokens from our query string. For example, if you have a field *type* which contains either *book*, *author*, *publisher* and you want to find every *books* or *authors*, this is the condition you would probably use.
+
+<pre><code>
+$q = new Tyrant_query();
+$q->addCond('type', Tyrant_Query::QCSTROREQ, 'book,author');
+</code></pre>
+
+## Tyrant_Query::QCSTRRX
+
+Uses a regular expression.
+
+----
+
+## Tyrant_Query::QCFTSOR
+
+Tyrant will first turn the query string into tokens, then it will try to find records which match at least one of these tokens. But unlike QCSTROR, this is done in a case-insensitive way and works on substrings. We could say it works like a case-sensitive LIKE. Note that it only works on ascii. So for example :
+
+- **l** => **L**a Geste des Princes-Démons
+- **rin** => La Geste des P**rin**ces-Démons
+- **demon** => La Geste des Princes-**Démon**s
+- **démon** => *not found* because it only works with ascii
