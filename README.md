@@ -76,3 +76,40 @@ while ($k = $tt->iternext()) {
 }
 </code></pre>
 
+
+# How to use the RDBTable API
+
+RDBTable works like standard database tables except you are not limited by a schema. A key can hold multiple columns, it is up to you to choose which columns are useful for your application.
+
+## Storing records
+
+To store a new record, you decide what is your primary key and what are your data :
+
+<pre><code>
+$tt = Tyrant::connect();
+$key = 'user:1';
+$cols = array('name' => 'john', 'age' => 20);
+$tt->put($key, $cols);
+</code></pre>
+
+Since the RDBTable API implements ArrayAccess, you can also store a record like this:
+
+<pre><code>
+$tt['user:1'] = array('name' => 'john', 'age' => 20);
+</code></pre>
+
+The RDBTable API also provides putkeep(). If a record with the same key exists in the database, this method has no effect.
+
+There is also a putcat() to concatenate columns of the existing record. If there is no corresponding record, a new record is created.
+
+## Getting records
+
+To get the record you either use get() or the ArrayAccess API.
+
+<pre><code>
+$user = $tt['user:1'];
+$user = $tt->get('user:1');
+</code></pre>
+
+Searching in the database is performed using a [[TyrantQuery]] object.
+
