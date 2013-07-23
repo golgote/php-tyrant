@@ -1,3 +1,9 @@
+This is a PHP wrapper to communicate with Tokyo Tyrant through sockets.
+The code was written by Bertrand Mansion in 2008.
+
+Note : I am not using Tyrant in any project at the moment so I haven't followed its development. It is possible that this code is not compatible with recent versions.
+Don't hesitate to fork and push.
+
 # Connection
 
 Currently, PHP Tyrant supports the two API proposed by Tokyo Tyrant, that is [[RDB]] for hash and b-tree databases, and [[RDBTable]] for Table databases.
